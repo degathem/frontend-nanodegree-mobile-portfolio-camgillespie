@@ -43,13 +43,32 @@ gulp.task('uglify',['cssminify'], function(){
 });
 
 // Resize and compress the images
-gulp.task('images',['uglify'], function(){
+gulp.task('mainimages',['uglify'], function(){
     return gulp.src('src/img/**')
+        .pipe(imagemin({
+            otimizationLevel: 3,
+            progressive: true,
+            interlaced: true
+        }))
+        .pipe(gulp.dest('build/img'));
+});
+
+// resize and compress the pizzeria image because it is waaay to big
+gulp.task('pizzeriaimage',['mainimages'], function () {
+    return gulp.src('src/views/images/pizzeria.jpg')
+        .pipe(imageresize({
+            width: 100
+        }))
+        .pipe(imagemin({
+            otimizationLevel: 3,
+            progressive: true,
+            interlaced: true
+        }))
         .pipe(gulp.dest('build/img'));
 });
 
 // Inline css and javascript into index.html and minify
-gulp.task('html',['images'], function(){
+gulp.task('html',['pizzeriaimage'], function(){
     return gulp.src('src/*.html')
         .pipe(smoosher({
             base: 'build'
@@ -58,7 +77,7 @@ gulp.task('html',['images'], function(){
         .pipe(gulp.dest('build'));
 });
 
-// Remove the js folder and styles.css because they are both inlined into the 
+// Remove the js folder and styles.css because they are both inlined into 
 // index.html
 gulp.task('cleantemp', function () {
     return gulp.src()
